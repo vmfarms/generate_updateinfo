@@ -17,18 +17,34 @@ generate_updateinfo.py /path/to/errata.latest.xml
 ```
 
 It will write out a number of updateinfo.xml files in the 
-BUILD_PREFIX/updateinfo-<release>/ directory.
+BUILD_PREFIX/updateinfo-RELEASES/ directory.
 
+You can now take the appropriate updateinfo.xml file and inject it in your
+repository using the /usr/bin/modifyrepo command.
+
+Example
+-------
+The following example illustrates how you would go about using this for a CentOS 6 repo.
+The assumption is that you've set the BUILD_PREFIX=/security and that your CentOS-6-Updates
+directory lives under /repositories/
+
+```bash
+wget -q -N -P/security http://cefs.steve-meier.de/errata.latest.xml
+
+generate_updateinfo.py /security/errata.latest.xml
+
+/usr/bin/modifyrepo /security/updateinfo-6/updateinfo.xml /repositories/CentOS-6-Updates/repodata
+```
 
 Authors
 -------
-Kristian Kostecky [VM Farms]
+Kristian Kostecky [http://vmfarms.com]
 
 
 Copyright and license
 ---------------------
 
-Copyright (C) 2013  Kristian K. [VM Farms] (kris@vmfarms.com)
+Copyright (C) 2013  Kristian K. [http://vmfarms.com] [kris@vmfarms.com]
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
