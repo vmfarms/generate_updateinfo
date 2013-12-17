@@ -12,7 +12,9 @@ Usage
 You must set the configuration variables in the header of the script first.
 Once you've done this, simply run:
 
+```bash
 generate_updateinfo.py /path/to/errata.latest.xml
+```
 
 It will write out a number of updateinfo.xml files in the 
 BUILD_PREFIX/updateinfo-<release>/ directory.
