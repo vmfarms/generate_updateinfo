@@ -1,10 +1,10 @@
 UPDATEINFO.XML GENERATION
 =========================
 
-This utility eats a errata.latest.xml from the CEFS project and converts
-it in to a useable updateinfo.xml that you can inject in to your CentOS
-repositories. It is purpose built for a specific use case, but it can
-be modified to suit your particular needs.
+This utility eats an errata.latest.xml from the CEFS project [http://cefs.steve-meier.de]
+and converts it in to a useable updateinfo.xml that you can inject in to your CentOS 
+repositories. It is purpose built for a specific use case, but it can be modified to 
+suit your particular needs.
 
 
 Usage
