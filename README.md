@@ -36,6 +36,31 @@ generate_updateinfo.py /security/errata.latest.xml
 /usr/bin/modifyrepo /security/updateinfo-6/updateinfo.xml /repositories/CentOS-6-Updates/repodata
 ```
 
+Now that your repos have the data they need you can install the yum-plugin-security package
+and make use of it like so
+
+```bash
+yum install yum-plugin-security
+
+yum security-list
+
+Failed to set locale, defaulting to C
+Loaded plugins: changelog, fastestmirror, rpmrebuild_rollback, security
+Loading mirror speeds from cached hostfile
+ * extras: mirrors.cmich.edu
+ * webtatic: us-east.repo.webtatic.com
+CentOS-6-OS                                                                                                                                                                              | 1.2 kB     00:00
+CentOS-6-Updates                                                                                                                                                                         | 1.2 kB     00:00
+CESA_2013__1764        security    ruby-1.8.7.352-13.el6.x86_64
+CESA_2013__1764        security    ruby-irb-1.8.7.352-13.el6.x86_64
+CESA_2013__1764        security    ruby-libs-1.8.7.352-13.el6.x86_64
+CESA_2013__1764        security    ruby-rdoc-1.8.7.352-13.el6.x86_64
+CESA_2013__1806        security    samba-client-3.6.9-167.el6_5.x86_64
+CESA_2013__1806        security    samba-common-3.6.9-167.el6_5.x86_64
+CESA_2013__1806        security    samba-winbind-3.6.9-167.el6_5.x86_64
+CESA_2013__1806        security    samba-winbind-clients-3.6.9-167.el6_5.x86_64
+```
+
 Authors
 -------
 Kristian Kostecky [http://vmfarms.com]
