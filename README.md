@@ -44,13 +44,11 @@ yum install yum-plugin-security
 
 yum security-list
 
-Failed to set locale, defaulting to C
-Loaded plugins: changelog, fastestmirror, rpmrebuild_rollback, security
+Loaded plugins: changelog, fastestmirror, security
 Loading mirror speeds from cached hostfile
- * extras: mirrors.cmich.edu
- * webtatic: us-east.repo.webtatic.com
 CentOS-6-OS                                                                                                                                                                              | 1.2 kB     00:00
 CentOS-6-Updates                                                                                                                                                                         | 1.2 kB     00:00
+
 CESA_2013__1764        security    ruby-1.8.7.352-13.el6.x86_64
 CESA_2013__1764        security    ruby-irb-1.8.7.352-13.el6.x86_64
 CESA_2013__1764        security    ruby-libs-1.8.7.352-13.el6.x86_64
