@@ -29,11 +29,11 @@ The assumption is that you've set the BUILD_PREFIX=/security and that your CentO
 directory lives under /repositories/
 
 ```bash
-wget -q -N -P/security http://cefs.steve-meier.de/errata.latest.xml
+wget -q -N -P/tmp http://cefs.steve-meier.de/errata.latest.xml
 
-generate_updateinfo.py /security/errata.latest.xml
+generate_updateinfo.py /tmp/errata.latest.xml
 
-/usr/bin/modifyrepo /security/updateinfo-6/updateinfo.xml /repositories/CentOS-6-Updates/repodata
+/usr/bin/modifyrepo /tmp/updateinfo-6/updateinfo.xml /repositories/CentOS-6-Updates/repodata
 ```
 
 Now that your repos have the data they need you can install the yum-plugin-security package
