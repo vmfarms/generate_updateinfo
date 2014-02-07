@@ -22,9 +22,9 @@ BUILD_PREFIX/updateinfo-RELEASES/ directory.
 You can now take the appropriate updateinfo.xml file and inject it in your
 repository using the /usr/bin/modifyrepo command.
 
-*NOTE* that there is a other repo in the RELEASES variable. That is the repo where all packages
-that don't match a particular release number will be stored. You can use this for debugging
-or other tracking purposes. You don't need to inject this in to any of your repos.
+*NOTE* that there is an 'other' release in the RELEASES variable. That is the directory where 
+all packages that don't match a particular release number will be stored. You can use this for
+debugging or other tracking purposes. You don't need to inject this in to any of your repos.
 
 Example
 -------
