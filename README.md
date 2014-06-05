@@ -33,9 +33,11 @@ The assumption is that you've set the BUILD_PREFIX=/security and that your CentO
 directory lives under /repositories/
 
 ```bash
-wget -q -N -P/tmp http://cefs.steve-meier.de/errata.latest.xml
+wget -q -N -P/tmp http://cefs.steve-meier.de/errata.latest.xml.bz2
 
-generate_updateinfo.py /tmp/errata.latest.xml
+(cd /tmp/ && sha1sum -c <(wget -qO- http://cefs.steve-meier.de/errata.latest.sha1|grep bz2) )
+
+generate_updateinfo.py <(bzip2 -dc /tmp/errata.latest.xml.bz2)
 
 /usr/bin/modifyrepo /tmp/updateinfo-6/updateinfo.xml /repositories/CentOS-6-Updates/repodata
 ```
