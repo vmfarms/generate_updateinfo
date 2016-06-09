@@ -143,6 +143,7 @@ def build_updateinfo(src):
         except Exception, e:
             logging.error("Error opening file: %s" % e)
 
+        rel_fd[rel_num].write('<?xml version="1.0" encoding="UTF-8"?>\n')
         rel_fd[rel_num].write('<updates>\n')
             
     pkg_parts = re.compile("(?P<name>.*)-(?P<version>.*)-(?P<release>.*)\.(?P<arch>.*).rpm")
@@ -191,6 +192,7 @@ def build_updateinfo(src):
                 try:
                     pkg_match = pkg_parts.match(pkg)
                     package = pkg_match.groupdict()
+                    package.update({ 'filename': pkg })
                     packages.append(package)
                 except Exception, err:
                     logging.warning("Package name '%s' couldn't be matched against regex" % (pkg))
@@ -216,7 +218,7 @@ def build_updateinfo(src):
             rel_fd[p_release].write("    <issued date=\"%s\" />\n" % sec_dict._attrs['issue_date'])
             rel_fd[p_release].write("    <references>\n")
             for ref in sec_dict._attrs['references'].split():
-                rel_fd[p_release].write("      <reference href=\"%s\"/>\n" % ref)
+                rel_fd[p_release].write("      <reference href=\"%s\" type=\"CEFS\"/>\n" % ref)
             rel_fd[p_release].write("    </references>\n")
             rel_fd[p_release].write("    <description>%s</description>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <pkglist>\n")
@@ -224,7 +226,7 @@ def build_updateinfo(src):
             rel_fd[p_release].write("        <name>CentOS %s</name>\n" % p_release)
             for pkg in packages:
                 rel_fd[p_release].write("        <package arch=\"%s\" epoch=\"%s\" name=\"%s\" release=\"%s\" src=\"%s\" version=\"%s\">\n" % (pkg['arch'], "0", pkg['name'], pkg['release'], "", pkg['version']))
-                rel_fd[p_release].write("          <filename>%s</filename>\n" % (pkg))
+                rel_fd[p_release].write("          <filename>%(filename)s</filename>\n" % (pkg))
                 rel_fd[p_release].write("        </package>\n")
             rel_fd[p_release].write("      </collection>\n")
             rel_fd[p_release].write("    </pkglist>\n")
