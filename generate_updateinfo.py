@@ -21,29 +21,58 @@ import os
 import errno
 import logging
 
+from optparse import OptionParser
+parser = OptionParser(usage= "usage: [options] <path to errata.xml>")
+
+parser.add_option("-r", "--release", dest="release", default=[],
+                  type=str, action='append', help="What releases would you like to track)")
+
+parser.add_option("-f", "--from", dest="from_email", default="you@your_domain.com",
+                  help="Email address of the maintainer")
+
+parser.add_option("-d", "--destination", dest="destination", default="/tmp",
+                  help="Directory to build the files under")
+
+parser.add_option("--sentry-dsn", dest="sentry_dsn",
+                  help="Directory to build the files under")
+
+parser.add_option("-s", "--severity", dest="severity", default=[], 
+                  type=str, action='append', help="What severity levels do we want to include")
+(options, args) = parser.parse_args()
+
+if len(options.severity) == 0:
+  options.severity = ['Critical', 'Important']
+
+if len(options.release) == 0:
+  options.release = ['5', '6', '7']
+
+# other is mandatory
+options.release.append("other")
+
+print "Parsed options:"
+print options
+
 ##### START CONFIGURATION HEADER #####
-# Set to true if you want to use Sentry
-SENTRY = False
 # Sentry logging
-if SENTRY:
+if options.sentry_dsn:
     from raven.handlers.logging import SentryHandler
     from raven import Client
     from raven.conf import setup_logging
-    sentry_client = Client('INSERT_SENTRY_DSN_HERE')
+    sentry_client = Client(options.sentry_dsn)
     handler = SentryHandler(sentry_client)
     setup_logging(handler)
 
 # What releases would you like to track. 'other' is mandatory
-RELEASES = ['6','other']
+RELEASES = options.release
 
 # What severity levels do we want to include
-SEVERITY = ['Critical', 'Important']
+SEVERITY = options.severity
 
 # Who is this from?
-UPDATE_FROM = "you@your_domain.com"
+UPDATE_FROM = options.from_email
 
 # Directory prefix to build the files under.
-BUILD_PREFIX = "/tmp"
+BUILD_PREFIX = options.destination
 
 ##### END CONFIGURATION HEADER #####
 
@@ -237,9 +266,10 @@ def build_updateinfo(src):
 
 if __name__ == "__main__":
     try:
-        if len(sys.argv) < 2:
-            sys.exit("Usage: %s <path to errata.xml>\n")
-        errata_file = open(sys.argv[1], 'r')
+        if len(args) < 1:
+            parser.print_help()
+            sys.exit()
+        errata_file = open(args[0], 'r')
         errata_xml = errata_file.read()
         errata = xml2obj(errata_xml)
         build_updateinfo(errata)
