@@ -245,6 +245,7 @@ def build_updateinfo(src):
             rel_fd[p_release].write("    <title>%s</title>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <release>CentOS %s</release>\n" % p_release)
             rel_fd[p_release].write("    <issued date=\"%s\" />\n" % sec_dict._attrs['issue_date'])
+            rel_fd[p_release].write("    <severity>%s</severity>\n" % sec_dict._attrs['severity'])
             rel_fd[p_release].write("    <references>\n")
             for ref in sec_dict._attrs['references'].split():
                 rel_fd[p_release].write("      <reference href=\"%s\" type=\"CEFS\"/>\n" % ref)
