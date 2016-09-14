@@ -188,20 +188,23 @@ def build_updateinfo(src):
         if "meta" == i:
             continue
 
-        # Is this a properly formatted CEBA/CESA entry?
+        # Is this a properly formatted CESA/CEBA/CEEA entry?
         if 'type' not in sec_dict:
-            logging.warning("Improperly formatted CEBA/CESA entry: %s" % (i))
+            logging.warning("Improperly formatted CESA/CEBA/CEEA entry: %s" % (i))
             continue
 
+        # Ensure that this advisory is a supported type
+        if sec_dict._attrs['type'] not in ['Security Advisory','Bug Fix Advisory','Product Enhancement Advisory']:
+            logging.warning("Unsupported advisory type: %s" % (i))
+            continue
+ 
         # Is this a security advisory?
-        if sec_dict._attrs['type'] != 'Security Advisory':
-            continue
-
-        # What severity levels are we including? 
-        if 'severity' not in sec_dict._attrs:
-            continue
-        if sec_dict._attrs['severity'] not in SEVERITY:
-            continue
+        if sec_dict._attrs['type'] == 'Security Advisory':
+            # What severity levels are we including? 
+            if 'severity' not in sec_dict._attrs:
+                continue
+            if sec_dict._attrs['severity'] not in SEVERITY:
+                continue
 
         # More than one OS release? Generate multiple entries
         if sec_dict.os_release == None:
@@ -240,11 +243,18 @@ def build_updateinfo(src):
             if p_release not in RELEASES:
                 p_release = "other"
 
-            rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == 'Security Advisory':
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == 'Bug Fix Advisory':
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="bugfix" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == 'Product Enhancement Advisory':
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="enhancement" version="1.4">\n' % UPDATE_FROM)
             rel_fd[p_release].write("    <id>%s</id>\n" % i)
             rel_fd[p_release].write("    <title>%s</title>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <release>CentOS %s</release>\n" % p_release)
             rel_fd[p_release].write("    <issued date=\"%s\" />\n" % sec_dict._attrs['issue_date'])
+            if sec_dict._attrs['type'] == 'Security Advisory':
+                rel_fd[p_release].write("    <severity>%s</severity>\n" % sec_dict._attrs['severity'])
             rel_fd[p_release].write("    <references>\n")
             for ref in sec_dict._attrs['references'].split():
                 rel_fd[p_release].write("      <reference href=\"%s\" type=\"CEFS\"/>\n" % ref)
