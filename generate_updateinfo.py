@@ -301,7 +301,6 @@ def build_updateinfo(src):
             if p_release not in RELEASES:
                 p_release = "other"
 
-            rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
             if sec_dict._attrs['type'] == adv_types['security']:
                 rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
             if sec_dict._attrs['type'] == adv_types['bugfix']:
