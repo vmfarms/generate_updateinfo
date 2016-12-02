@@ -21,11 +21,26 @@ import os
 import errno
 import logging
 
+# Valid Security Advisory Severities
+sec_sevs = [
+    'Critical',
+    'Moderate',
+    'Important',
+    'Low'
+] 
+
+# Valid Advisory Types And Their Short Names
+adv_types = {
+    'security': 'Security Advisory',
+    'bugfix': 'Bug Fix Advisory',
+    'enhancement': 'Product Enhancement Advisory'
+}
+
 from optparse import OptionParser
-parser = OptionParser(usage= "usage: [options] <path to errata.xml>")
+parser = OptionParser(usage= "usage: {} [options] <path to errata.xml>".format(os.path.basename(__file__)))
 
 parser.add_option("-r", "--release", dest="release", default=[],
-                  type=str, action='append', help="What releases would you like to track)")
+                  type=str, action='append', help="What releases would you like to track")
 
 parser.add_option("-f", "--from", dest="from_email", default="you@your_domain.com",
                   help="Email address of the maintainer")
@@ -37,20 +52,31 @@ parser.add_option("--sentry-dsn", dest="sentry_dsn",
                   help="Directory to build the files under")
 
 parser.add_option("-s", "--severity", dest="severity", default=[], 
-                  type=str, action='append', help="What severity levels do we want to include")
+                  type=str, action='append', help="What severity levels (critical/moderate/important/low/all) do we want to include")
+
+parser.add_option("-t", "--type", dest="type", default=[], 
+                  type=str, action='append', help="What advisory types (security/bugfix/enhancement/all) do we want to include")
+
+parser.add_option("-v", "--verbose", dest="verbose", default=False,
+                  action='store_true', help="Add verbosity")
+
 (options, args) = parser.parse_args()
 
 if len(options.severity) == 0:
-  options.severity = ['Critical', 'Important']
+    options.severity = ['Critical', 'Important']
+
+if len(options.type) == 0:
+    options.type = ['security']
 
 if len(options.release) == 0:
-  options.release = ['5', '6', '7']
+    options.release = ['5', '6', '7']
 
 # other is mandatory
 options.release.append("other")
 
-print "Parsed options:"
-print options
+if options.verbose:
+    print "Parsed options:"
+    print options
 
 ##### START CONFIGURATION HEADER #####
 # Sentry logging
@@ -66,8 +92,37 @@ if options.sentry_dsn:
 RELEASES = options.release
 
 # What severity levels do we want to include
-SEVERITY = options.severity
+SEVERITY = []
+for ssev in options.severity:
+    if (ssev.capitalize() not in sec_sevs):
+        if (ssev.lower() == 'all'):
+            for vsev in sec_sevs:
+                SEVERITY.append(vsev.capitalize())
+            break
+        else:
+            print "Invalid security severity specified ({}).".format(ssev)
+            sys.exit(1)
+    else:
+        SEVERITY.append(ssev.capitalize())
+if options.verbose:
+    print "SEVERITY: {}".format(SEVERITY)
 
+# What types of advisories would you like to track?
+TYPES = []
+for atype in options.type:
+    if (atype.lower() not in adv_types):
+        if (atype.lower() == 'all'):
+            for vtype in adv_types:
+                TYPES.append(adv_types[vtype])
+            break
+        else:
+            print "Invalid advisory type specified ({}).".format(atype)
+            sys.exit(1)
+    else:
+        TYPES.append(adv_types[atype.lower()])
+if options.verbose:
+    print "TYPES: {}".format(TYPES)
+    
 # Who is this from?
 UPDATE_FROM = options.from_email
 
@@ -188,20 +243,26 @@ def build_updateinfo(src):
         if "meta" == i:
             continue
 
-        # Is this a properly formatted CEBA/CESA entry?
+        # Is this a properly formatted CESA/CEBA/CEEA entry?
         if 'type' not in sec_dict:
-            logging.warning("Improperly formatted CEBA/CESA entry: %s" % (i))
+            logging.warning("Improperly formatted CESA/CEBA/CEEA entry: %s" % (i))
             continue
 
+        # Ensure that this advisory is a wanted advisory type
+        if sec_dict._attrs['type'] not in TYPES:
+            logging.warning("Unwanted advisory type: %s.  Skipping" % (i))
+            continue
+ 
         # Is this a security advisory?
-        if sec_dict._attrs['type'] != 'Security Advisory':
-            continue
-
-        # What severity levels are we including? 
-        if 'severity' not in sec_dict._attrs:
-            continue
-        if sec_dict._attrs['severity'] not in SEVERITY:
-            continue
+        if sec_dict._attrs['type'] == adv_types['security']:
+            # Ensure that the advisory has a severity
+            if 'severity' not in sec_dict._attrs:
+                logging.warning("Security advisory missing severity: %s.  Skipping" % (i))
+                continue
+            # Ensure that we want this security advisory severity
+            if sec_dict._attrs['severity'] not in SEVERITY:
+                logging.warning("Unwanted security advisory severity: %s.  Skipping" % (i))
+                continue
 
         # More than one OS release? Generate multiple entries
         if sec_dict.os_release == None:
@@ -240,11 +301,18 @@ def build_updateinfo(src):
             if p_release not in RELEASES:
                 p_release = "other"
 
-            rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == adv_types['security']:
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == adv_types['bugfix']:
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="bugfix" version="1.4">\n' % UPDATE_FROM)
+            if sec_dict._attrs['type'] == adv_types['enhancement']:
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="enhancement" version="1.4">\n' % UPDATE_FROM)
             rel_fd[p_release].write("    <id>%s</id>\n" % i)
             rel_fd[p_release].write("    <title>%s</title>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <release>CentOS %s</release>\n" % p_release)
             rel_fd[p_release].write("    <issued date=\"%s\" />\n" % sec_dict._attrs['issue_date'])
+            if sec_dict._attrs['type'] == adv_types['security']:
+                rel_fd[p_release].write("    <severity>%s</severity>\n" % sec_dict._attrs['severity'])
             rel_fd[p_release].write("    <references>\n")
             for ref in sec_dict._attrs['references'].split():
                 rel_fd[p_release].write("      <reference href=\"%s\" type=\"CEFS\"/>\n" % ref)
