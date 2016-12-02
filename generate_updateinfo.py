@@ -1,4 +1,4 @@
-#!/usr/bin/env python26
+#!/usr/bin/env python2
 #    Copyright (C) 2013  Kristian K. [http://vmfarms.com] [kris@vmfarms.com]
 #
 #    This program is free software: you can redistribute it and/or modify
