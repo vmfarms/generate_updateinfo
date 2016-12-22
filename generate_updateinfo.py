@@ -37,7 +37,7 @@ adv_types = {
 }
 
 from optparse import OptionParser
-parser = OptionParser(usage= "usage: {} [options] <path to errata.xml>".format(os.path.basename(__file__)))
+parser = OptionParser(usage= "usage: {0} [options] <path to errata.xml>".format(os.path.basename(__file__)))
 
 parser.add_option("-r", "--release", dest="release", default=[],
                   type=str, action='append', help="What releases would you like to track")
