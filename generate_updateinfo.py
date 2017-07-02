@@ -238,6 +238,11 @@ def build_updateinfo(src):
     pkg_parts = re.compile("(?P<name>.*)-(?P<version>.*)-(?P<release>.*)\.(?P<arch>.*).rpm")
     pkg_os_rel = re.compile(".*\.el(?P<os_rel>[0-9]*).*")
     for i in src._attrs.keys():
+        # Pretty print i in CentOS format (CESA_2017__1481 -> CESA:2017-1481)
+        pretty_i = i
+        pretty_i = pretty_i.replace("__","-")
+        pretty_i = pretty_i.replace("_",":")
+        
         # Sometimes it's a dict, sometimes it's a list, where we just take the first element.
         if type(src._attrs[i]) is list:
             sec_dict = src._attrs[i][0]
@@ -250,23 +255,23 @@ def build_updateinfo(src):
 
         # Is this a properly formatted CESA/CEBA/CEEA entry?
         if 'type' not in sec_dict:
-            logging.warning("Improperly formatted CESA/CEBA/CEEA entry: %s" % (i))
+            logging.warning("Improperly formatted CESA/CEBA/CEEA entry: %s" % (pretty_i))
             continue
 
         # Ensure that this advisory is a wanted advisory type
         if sec_dict._attrs['type'] not in TYPES:
-            logging.warning("Unwanted advisory type: %s.  Skipping" % (i))
+            logging.warning("Unwanted advisory type: %s.  Skipping" % (pretty_i))
             continue
  
         # Is this a security advisory?
         if sec_dict._attrs['type'] == adv_types['security']:
             # Ensure that the advisory has a severity
             if 'severity' not in sec_dict._attrs:
-                logging.warning("Security advisory missing severity: %s.  Skipping" % (i))
+                logging.warning("Security advisory missing severity: %s.  Skipping" % (pretty_i))
                 continue
             # Ensure that we want this security advisory severity
             if sec_dict._attrs['severity'] not in SEVERITY:
-                logging.warning("Unwanted security advisory severity: %s.  Skipping" % (i))
+                logging.warning("Unwanted security advisory severity: %s.  Skipping" % (pretty_i))
                 continue
 
         # More than one OS release? Generate multiple entries
@@ -312,7 +317,7 @@ def build_updateinfo(src):
                 rel_fd[p_release].write('  <update from="%s" status="stable" type="Bugfix" version="1.4">\n' % UPDATE_FROM)
             if sec_dict._attrs['type'] == adv_types['enhancement']:
                 rel_fd[p_release].write('  <update from="%s" status="stable" type="Enhancement" version="1.4">\n' % UPDATE_FROM)
-            rel_fd[p_release].write("    <id>%s</id>\n" % i)
+            rel_fd[p_release].write("    <id>%s</id>\n" % pretty_i)
             rel_fd[p_release].write("    <title>%s</title>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <release>CentOS %s</release>\n" % p_release)
             rel_fd[p_release].write("    <issued date=\"%s\" />\n" % sec_dict._attrs['issue_date'])
