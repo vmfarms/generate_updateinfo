@@ -312,11 +312,11 @@ def build_updateinfo(src):
                 p_release = "other"
 
             if sec_dict._attrs['type'] == adv_types['security']:
-                rel_fd[p_release].write('  <update from="%s" status="stable" type="Security" version="1.4">\n' % UPDATE_FROM)
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="security" version="1.4">\n' % UPDATE_FROM)
             if sec_dict._attrs['type'] == adv_types['bugfix']:
-                rel_fd[p_release].write('  <update from="%s" status="stable" type="Bugfix" version="1.4">\n' % UPDATE_FROM)
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="bugfix" version="1.4">\n' % UPDATE_FROM)
             if sec_dict._attrs['type'] == adv_types['enhancement']:
-                rel_fd[p_release].write('  <update from="%s" status="stable" type="Enhancement" version="1.4">\n' % UPDATE_FROM)
+                rel_fd[p_release].write('  <update from="%s" status="stable" type="enhancement" version="1.4">\n' % UPDATE_FROM)
             rel_fd[p_release].write("    <id>%s</id>\n" % pretty_i)
             rel_fd[p_release].write("    <title>%s</title>\n" % sec_dict._attrs['synopsis'])
             rel_fd[p_release].write("    <release>CentOS %s</release>\n" % p_release)
