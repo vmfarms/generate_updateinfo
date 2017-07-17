@@ -324,6 +324,9 @@ def build_updateinfo(src):
             if sec_dict._attrs['type'] == adv_types['security']:
                 rel_fd[p_release].write("    <severity>%s</severity>\n" % sec_dict._attrs['severity'])
             rel_fd[p_release].write("    <references>\n")
+            if 'keywords' in sec_dict._attrs:
+                if re.search("reboot_suggested", sec_dict._attrs['keywords']):
+                    rel_fd[p_release].write("    <reboot_suggested>1</reboot_suggested>\n")
             for ref in sec_dict._attrs['references'].split():
                 rel_fd[p_release].write("      <reference href=\"%s\" type=\"CEFS\"/>\n" % ref)
             rel_fd[p_release].write("    </references>\n")
