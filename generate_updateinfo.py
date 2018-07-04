@@ -281,6 +281,11 @@ def build_updateinfo(src):
             # If we can't pull the release, then we infer it from the package names
             p_release = release
             packages = []
+
+            if type(sec_dict.packages) is not list:
+              pkgs = [ sec_dict.packages ]
+              sec_dict.packages = pkgs
+
             for pkg in sec_dict.packages:
                 package = None
                 # Parse the package name
