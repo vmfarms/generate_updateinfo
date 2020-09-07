@@ -14,12 +14,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+from __future__ import absolute_import
+from __future__ import print_function
 import re
 import xml.sax.handler
 import sys
 import os
 import errno
 import logging
+import six
 
 # Valid Security Advisory Severities
 sec_sevs = [
@@ -72,14 +75,14 @@ if len(options.type) == 0:
     options.type = ['security']
 
 if len(options.release) == 0:
-    options.release = ['5', '6', '7']
+    options.release = ['5', '6', '7', '8']
 
 # other is mandatory
 options.release.append("other")
 
 if options.verbose:
-    print "Parsed options:"
-    print options
+    print("Parsed options:")
+    print(options)
 
 logging.basicConfig(level = options.log_level.upper())
 
@@ -105,12 +108,12 @@ for ssev in options.severity:
                 SEVERITY.append(vsev.capitalize())
             break
         else:
-            print "Invalid security severity specified ({}).".format(ssev)
+            print("Invalid security severity specified ({}).".format(ssev))
             sys.exit(1)
     else:
         SEVERITY.append(ssev.capitalize())
 if options.verbose:
-    print "SEVERITY: {}".format(SEVERITY)
+    print("SEVERITY: {}".format(SEVERITY))
 
 # What types of advisories would you like to track?
 TYPES = []
@@ -121,12 +124,12 @@ for atype in options.type:
                 TYPES.append(adv_types[vtype])
             break
         else:
-            print "Invalid advisory type specified ({}).".format(atype)
+            print("Invalid advisory type specified ({}).".format(atype))
             sys.exit(1)
     else:
         TYPES.append(adv_types[atype.lower()])
 if options.verbose:
-    print "TYPES: {}".format(TYPES)
+    print("TYPES: {}".format(TYPES))
     
 # Who is this from?
 UPDATE_FROM = options.from_email
@@ -153,12 +156,12 @@ def xml2obj(src):
             # treat single element as a list of 1
             return 1
         def __getitem__(self, key):
-            if isinstance(key, basestring):
+            if isinstance(key, six.string_types):
                 return self._attrs.get(key,None)
             else:
                 return [self][key]
         def __contains__(self, name):
-            return self._attrs.has_key(name)
+            return name in self._attrs
         def __nonzero__(self):
             return bool(self._attrs or self.data)
         def __getattr__(self, name):
@@ -212,24 +215,24 @@ def xml2obj(src):
             self.text_parts.append(content)
 
     builder = TreeBuilder()
-    if isinstance(src,basestring):
+    if isinstance(src,six.string_types):
         xml.sax.parseString(src, builder)
     else:
         xml.sax.parse(src, builder)
-    return builder.root._attrs.values()[0]
+    return list(builder.root._attrs.values())[0]
 
 def build_updateinfo(src):
     rel_fd = {}
     for rel_num in RELEASES:
         try:
             os.mkdir("%s/updateinfo-%s" % (BUILD_PREFIX, rel_num))
-        except OSError, e:
+        except OSError as e:
             # Directories that exist are fine
             if e.errno != errno.EEXIST:
                 logging.debug("Directory %s/updateinfo-%s already exists." % (BUILD_PREFIX, rel_num))
         try:
             rel_fd[rel_num] = open("%s/updateinfo-%s/updateinfo.xml" % (BUILD_PREFIX, rel_num), 'w')
-        except Exception, e:
+        except Exception as e:
             logging.error("Error opening file: %s" % e)
 
         rel_fd[rel_num].write('<?xml version="1.0" encoding="UTF-8"?>\n')
@@ -272,7 +275,7 @@ def build_updateinfo(src):
         # More than one OS release? Generate multiple entries
         if sec_dict.os_release == None:
             sec_dict.os_release = ""
-        if isinstance(sec_dict.os_release, basestring):
+        if isinstance(sec_dict.os_release, six.string_types):
             releases = [sec_dict.os_release]
         else:
             releases = sec_dict.os_release
@@ -294,7 +297,7 @@ def build_updateinfo(src):
                     package = pkg_match.groupdict()
                     package.update({ 'filename': pkg })
                     packages.append(package)
-                except Exception, err:
+                except Exception as err:
                     logging.warning("Package name '%s' couldn't be matched against regex" % (pkg))
                     continue
                 # Extract the el release from here, otherwise it has no discernable release
@@ -303,7 +306,7 @@ def build_updateinfo(src):
                         try:
                             p_rel_match = pkg_os_rel.match(package['release'])
                             p_release = p_rel_match.groupdict()['os_rel']
-                        except Exception, err:
+                        except Exception as err:
                             logging.warning("Package release '%s' couldn't be matched against regex" % (package['release']))
                             continue
         
@@ -351,5 +354,5 @@ if __name__ == "__main__":
         errata_xml = errata_file.read()
         errata = xml2obj(errata_xml)
         build_updateinfo(errata)
-    except Exception, e:
+    except Exception as e:
         logging.critical("Caught exception: %s" % e, exc_info=True)
