@@ -146,7 +146,7 @@ def xml2obj(src):
 
     non_id_char = re.compile('[^_0-9a-zA-Z]')
     def _name_mangle(name):
-        return non_id_char.sub('_', name)
+        return re.sub('--',':', non_id_char.sub('-', name))
 
     class DataNode(object):
         def __init__(self):

@@ -55,14 +55,14 @@ Loading mirror speeds from cached hostfile
 CentOS-6-OS                                                                                                                                                                              | 1.2 kB     00:00
 CentOS-6-Updates                                                                                                                                                                         | 1.2 kB     00:00
 
-CESA_2013__1764        security    ruby-1.8.7.352-13.el6.x86_64
-CESA_2013__1764        security    ruby-irb-1.8.7.352-13.el6.x86_64
-CESA_2013__1764        security    ruby-libs-1.8.7.352-13.el6.x86_64
-CESA_2013__1764        security    ruby-rdoc-1.8.7.352-13.el6.x86_64
-CESA_2013__1806        security    samba-client-3.6.9-167.el6_5.x86_64
-CESA_2013__1806        security    samba-common-3.6.9-167.el6_5.x86_64
-CESA_2013__1806        security    samba-winbind-3.6.9-167.el6_5.x86_64
-CESA_2013__1806        security    samba-winbind-clients-3.6.9-167.el6_5.x86_64
+CESA-2013:1764        security    ruby-1.8.7.352-13.el6.x86_64
+CESA-2013:1764        security    ruby-irb-1.8.7.352-13.el6.x86_64
+CESA-2013:1764        security    ruby-libs-1.8.7.352-13.el6.x86_64
+CESA-2013:1764        security    ruby-rdoc-1.8.7.352-13.el6.x86_64
+CESA-2013:1806        security    samba-client-3.6.9-167.el6_5.x86_64
+CESA-2013:1806        security    samba-common-3.6.9-167.el6_5.x86_64
+CESA-2013:1806        security    samba-winbind-3.6.9-167.el6_5.x86_64
+CESA-2013:1806        security    samba-winbind-clients-3.6.9-167.el6_5.x86_64
 ```
 
 Authors
