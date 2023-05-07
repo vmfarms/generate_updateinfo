@@ -1,0 +1,20 @@
+name: Improve issues on creation
+on:
+  issues:
+    types: [edited, opened]
+
+jobs:
+  gpt-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create useful comment with AI
+        uses: MaurerKrisztian/issue-improver-action@latest
+        with:
+          config-file: './improve_issue_config.json'
+          debug-mode: true
+          openai-key: ${{ secrets.OPENAI_API_KEY }}
+          max-tokens: 4097
+          add-related-issues-section: true
+          add-label-section: true
+          add-custom-section: true
