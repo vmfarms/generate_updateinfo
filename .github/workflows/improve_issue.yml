@@ -13,7 +13,6 @@ jobs:
         with:
           debug-mode: true
           openai-key: ${{ secrets.OPENAI_API_KEY }}
-          max-tokens: 4097
           add-related-issues-section: true
           add-label-section: true
           add-custom-section: true
