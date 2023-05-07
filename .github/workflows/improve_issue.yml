@@ -11,7 +11,6 @@ jobs:
       - name: Create useful comment with AI
         uses: MaurerKrisztian/issue-improver-action@latest
         with:
-          config-file: './improve_issue_config.json'
           debug-mode: true
           openai-key: ${{ secrets.OPENAI_API_KEY }}
           max-tokens: 4097
