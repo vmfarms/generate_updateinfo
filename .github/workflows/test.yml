@@ -1,0 +1,16 @@
+name: Check issue and reopen if incomplete
+
+on:
+  issues:
+    types: [closed, opened, edited]
+
+jobs:
+  check_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check issue
+        uses: kostecky/issue-checker@v1
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+#          label-name: "incomplete"
+#          comment-text: "Task list is not complete"
